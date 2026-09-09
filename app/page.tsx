@@ -441,13 +441,51 @@ function Poster({ kind }: { kind: "engagement" | "wedding" }) {
           <h2>Selvam <i>&</i><br />Raja Praba</h2>
           <br/>
           <div className="poster-professions">
-            <small>Selvam · B.E. · Software Engineer</small>
-            <em>Infoane Technologies</em>
-            <small>Raja Praba · BA LL.B. · Advocate</small>
+
+            <div className="profession-person">
+              <strong className="profession-name">Selvam</strong>
+
+              <span className="profession-role">
+                B.E. · Software Engineer
+              </span>
+
+              <span className="profession-company">
+                Infoane Technologies
+              </span>
+            </div>
+
+            <div className="profession-divider" aria-hidden="true">
+              <span />
+              <Heart fill="currentColor" />
+              <span />
+            </div>
+
+            <div className="profession-person">
+              <strong className="profession-name">Raja Praba</strong>
+
+              <span className="profession-role">
+                B.A.LL.B. · Advocate
+              </span>
+            </div>
+
           </div>
           <Heart fill="currentColor" />
           <h3>{engagement ? "24 October 2026" : "25 October 2026"}</h3>
-          <p>{engagement ? <>Saturday · Illathar Mahal<br />Kovilpatti</> : <>6:00 AM – 7:00 AM<br />Shenbhagavalli Amman Kovil</>}</p>
+          <p>
+            {engagement ? (
+              <>
+                7:00 PM – 9:00 PM | Saturday<br />
+                Illathar Mahal<br />
+                Puthugramam, Kovilpatti · 628502
+              </>
+            ) : (
+              <>
+                6:00 AM – 7:00 AM | Sunday<br />
+                Shenbagavalli Amman Kovil<br />
+                Kovilpatti · 628502
+              </>
+            )}
+          </p> 
         </div>
       </div>
       <a className="text-action" download href={image}><Download /> Save {engagement ? "engagement" : "wedding"} poster</a>
