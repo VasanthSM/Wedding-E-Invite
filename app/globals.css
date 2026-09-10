@@ -460,7 +460,7 @@ a { color: inherit; }
 
 .poster-professions {
   width: 100%;
-  margin: 1rem auto 0.8rem;
+  margin: 0.8rem auto 0.6rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -477,7 +477,7 @@ a { color: inherit; }
   align-items: center;
   justify-content: center;
 
-  gap: 3px;
+  gap: 2px;
 }
 
 /* Selvam / Raja Praba */
@@ -485,7 +485,7 @@ a { color: inherit; }
   display: block;
 
   font-family: var(--display);
-  font-size: clamp(1rem, 1.7vh, 1.25rem);
+  font-size: clamp(0.92rem, 1.4vh, 1rem);
   line-height: 1.1;
 
   font-weight: 600;

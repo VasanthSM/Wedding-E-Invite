@@ -292,7 +292,7 @@ function PremiumScratch({ onComplete }: { onComplete: () => void }) {
           <span className="date-eyebrow">OUR WEDDING DAY</span>
           <strong>25</strong>
           <b>OCTOBER · 2026</b>
-          <i>Selvam <em>♡</em> Raja Praba</i>
+          <i>Raja Praba <em>♡</em> Selvam</i>
         </div>
         <canvas
           ref={canvasRef}
@@ -557,32 +557,26 @@ function Poster({ kind }: { kind: "engagement" | "wedding" }) {
           <span>
             {engagement
               ? "ENGAGEMENT"
-              : "WEDDING · MUHURTHAM"}
+              : "WEDDING · முகூர்த்தம்"}
           </span>
 
           <h2>
-            Selvam <i>&</i>
+            Raja Praba <i>&</i>
             <br />
-            Raja Praba
+            Selvam
           </h2>
 
           <div className="poster-professions">
-            {/* Selvam */}
             <div className="profession-person">
               <strong className="profession-name">
-                Selvam
+                Raja Praba
               </strong>
 
               <span className="profession-role">
-                B.E. · Software Engineer
-              </span>
-
-              <span className="profession-company">
-                Infoane Technologies
+                B.A.LL.B., · Advocate
               </span>
             </div>
 
-            {/* Heart divider */}
             <div
               className="profession-divider"
               aria-hidden="true"
@@ -594,14 +588,17 @@ function Poster({ kind }: { kind: "engagement" | "wedding" }) {
               <span />
             </div>
 
-            {/* Raja Praba */}
             <div className="profession-person">
               <strong className="profession-name">
-                Raja Praba
+                Selvam
               </strong>
 
               <span className="profession-role">
-                B.A.LL.B., · Advocate
+                B.E. · Software Engineer
+              </span>
+
+              <span className="profession-company">
+                Infoane Technologies
               </span>
             </div>
           </div>
@@ -710,7 +707,7 @@ function Blessing() {
 
         <small className="blessing-caption">
           {blessed
-            ? "With love, Selvam & Raja Praba"
+            ? "With love, Raja Praba & Selvam"
             : "A tiny tap. A lot of love."}
         </small>
       </div>
@@ -818,7 +815,7 @@ export default function Home() {
             TOGETHER WITH OUR FAMILIES
           </span>
             <h1 className="couple-name">
-              Selvam
+              Raja Praba
             </h1>
 
             <div className="couple-ampersand">
@@ -826,7 +823,7 @@ export default function Home() {
             </div>
 
             <h1 className="couple-name couple-name-long">
-              Raja Praba
+              Selvam
             </h1>
 
           <div className="heart-rule">
@@ -850,12 +847,12 @@ export default function Home() {
           <i /><i /><i />
         </div>
         <div className="section-heading story-copy">
-          <span className="eyebrow">NINE YEARS · ONE FOREVER</span>
+          <span className="eyebrow">NINE YEARS · ONE LOVE</span>
           <h2>Written in the stars</h2>
           <p>From one beautiful hello to a lifetime of choosing each other.</p>
         </div>
         <div className="story-timeline">
-          <article><span>01</span><b>2017</b><p>We met</p></article>
+          <article><span>01</span><b>2017</b><p>It all began</p></article>
           <i />
           <article><span>02</span><b>2020</b><p>Stronger together</p></article>
           <i />
@@ -984,7 +981,7 @@ export default function Home() {
           <b>— திருவள்ளுவர் · திருக்குறள் 45</b>
 
           <small>
-            செல்வம் ♡ ராஜ பிரபா · 25 · 10 · 2026
+            ராஜ பிரபா ♡ செல்வம் · 25 · 10 · 2026
           </small>
         </div>
       </section>
