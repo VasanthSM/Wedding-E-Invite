@@ -12,6 +12,7 @@ import {
   Pause,
   Sparkles,
 } from "lucide-react";
+import { toPng } from "html-to-image";
 
 const WEDDING_TARGET = new Date("2026-10-25T06:00:00+05:30").getTime();
 const SECTION_IDS = [
@@ -425,25 +426,152 @@ function DateReveal({ done }: { done: () => void }) {
 
 function Poster({ kind }: { kind: "engagement" | "wedding" }) {
   const engagement = kind === "engagement";
-  const image = engagement ? "/images/engagement-poster.webp" : "/images/wedding-poster.webp";
+
+  const image = engagement
+    ? "/images/engagement-poster.webp"
+    : "/images/wedding-poster.webp";
+
+  const posterRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadPoster = useCallback(async () => {
+    const poster = posterRef.current;
+
+    if (!poster || downloading) return;
+
+    try {
+      setDownloading(true);
+
+      // Wait until all images inside the poster are fully loaded
+      const images = Array.from(
+        poster.querySelectorAll<HTMLImageElement>("img"),
+      );
+
+      await Promise.all(
+        images.map(
+          (img) =>
+            new Promise<void>((resolve) => {
+              if (img.complete && img.naturalWidth > 0) {
+                resolve();
+                return;
+              }
+
+              const finish = () => resolve();
+
+              img.addEventListener("load", finish, {
+                once: true,
+              });
+
+              img.addEventListener("error", finish, {
+                once: true,
+              });
+            }),
+        ),
+      );
+
+      // Wait for fonts before capturing
+      if (document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+
+      // Small delay so browser finishes rendering everything
+      await new Promise((resolve) =>
+        window.setTimeout(resolve, 150),
+      );
+
+      const dataUrl = await toPng(poster, {
+        cacheBust: true,
+
+        // Higher quality image
+        pixelRatio: 3,
+
+        backgroundColor: "#f8eee9",
+
+        skipAutoScale: true,
+      });
+
+      const link = document.createElement("a");
+
+      link.href = dataUrl;
+
+      link.download = engagement
+        ? "Selvam-Raja-Praba-Engagement-Poster.png"
+        : "Selvam-Raja-Praba-Wedding-Poster.png";
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Poster download failed:", error);
+
+      alert(
+        "Unable to download the poster. Please try again.",
+      );
+    } finally {
+      setDownloading(false);
+    }
+  }, [downloading, engagement]);
 
   return (
-    <section id={engagement ? "engagement" : "wedding"} className={`page poster-page ${engagement ? "engagement-page" : "wedding-page"} section-reveal`}>
+    <section
+      id={engagement ? "engagement" : "wedding"}
+      className={`page poster-page ${
+        engagement
+          ? "engagement-page"
+          : "wedding-page"
+      } section-reveal`}
+    >
       <div className="poster-kicker">
-        <span className="eyebrow">{engagement ? "THE EVENING BEFORE" : "THE MOMENT WE SAY I DO"}</span>
-        <b>{engagement ? "Engagement" : "Muhurtham"}</b>
-      </div>
-      <div className="poster-frame">
-        <img src={image} loading="lazy" alt={engagement ? "Engagement invitation backdrop" : "Wedding invitation backdrop"} />
-        <div className="poster-vignette" />
-        <div className="poster-copy">
-          <span>{engagement ? "ENGAGEMENT" : "WEDDING · MUHURTHAM"}</span>
-          <h2>Selvam <i>&</i><br />Raja Praba</h2>
-          <br/>
-          <div className="poster-professions">
+        <span className="eyebrow">
+          {engagement
+            ? "THE EVENING BEFORE"
+            : "THE MOMENT WE SAY I DO"}
+        </span>
 
+        <b>
+          {engagement
+            ? "Engagement"
+            : "Muhurtham"}
+        </b>
+      </div>
+
+      <div
+        className="poster-frame"
+        ref={posterRef}
+      >
+        <img
+          src={image}
+          loading="lazy"
+          alt={
+            engagement
+              ? "Engagement invitation backdrop"
+              : "Wedding invitation backdrop"
+          }
+        />
+
+        <div className="poster-vignette" />
+
+        <div className="poster-copy">
+          <span>
+            {engagement
+              ? "ENGAGEMENT"
+              : "WEDDING · MUHURTHAM"}
+          </span>
+
+          <h2>
+            Selvam <i>&</i>
+            <br />
+            Raja Praba
+          </h2>
+
+          <div className="poster-professions">
+            {/* Selvam */}
             <div className="profession-person">
-              <strong className="profession-name">Selvam</strong>
+              <strong className="profession-name">
+                Selvam
+              </strong>
 
               <span className="profession-role">
                 B.E. · Software Engineer
@@ -454,41 +582,79 @@ function Poster({ kind }: { kind: "engagement" | "wedding" }) {
               </span>
             </div>
 
-            <div className="profession-divider" aria-hidden="true">
+            {/* Heart divider */}
+            <div
+              className="profession-divider"
+              aria-hidden="true"
+            >
               <span />
+
               <Heart fill="currentColor" />
+
               <span />
             </div>
 
+            {/* Raja Praba */}
             <div className="profession-person">
-              <strong className="profession-name">Raja Praba</strong>
+              <strong className="profession-name">
+                Raja Praba
+              </strong>
 
               <span className="profession-role">
-                B.A.LL.B. · Advocate
+                B.A.LL.B., · Advocate
               </span>
             </div>
-
           </div>
-          <Heart fill="currentColor" />
-          <h3>{engagement ? "24 October 2026" : "25 October 2026"}</h3>
+
+          <h3>
+            {engagement
+              ? "24 October 2026"
+              : "25 October 2026"}
+          </h3>
+
           <p>
             {engagement ? (
               <>
-                7:00 PM – 9:00 PM | Saturday<br />
-                Illathar Mahal<br />
+                7:00 PM – 9:00 PM | Saturday
+                <br />
+
+                Illathar Mahal
+                <br />
+
                 Puthugramam, Kovilpatti · 628502
               </>
             ) : (
               <>
-                6:00 AM – 7:00 AM | Sunday<br />
-                Shenbagavalli Amman Kovil<br />
+                6:00 AM – 7:00 AM | Sunday
+                <br />
+
+                Shenbagavalli Amman Kovil
+                <br />
+
                 Kovilpatti · 628502
               </>
             )}
-          </p> 
+          </p>
         </div>
       </div>
-      <a className="text-action" download href={image}><Download /> Save {engagement ? "engagement" : "wedding"} poster</a>
+
+      <button
+        type="button"
+        className="text-action"
+        onClick={downloadPoster}
+        disabled={downloading}
+        aria-busy={downloading}
+      >
+        <Download />
+
+        {downloading
+          ? "Preparing poster..."
+          : `Save ${
+              engagement
+                ? "engagement"
+                : "wedding"
+            } poster`}
+      </button>
     </section>
   );
 }
@@ -651,18 +817,17 @@ export default function Home() {
           <span className="eyebrow">
             TOGETHER WITH OUR FAMILIES
           </span>
+            <h1 className="couple-name">
+              Selvam
+            </h1>
 
-          <h1 className="couple-name">
-            Selvam
-          </h1>
+            <div className="couple-ampersand">
+              <i>&amp;</i>
+            </div>
 
-          <h1 className="couple-ampersand">
-            <i>&</i>
-          </h1>
-
-          <h1 className="couple-name couple-name-long">
-            Raja Praba
-          </h1>
+            <h1 className="couple-name couple-name-long">
+              Raja Praba
+            </h1>
 
           <div className="heart-rule">
             <span />
@@ -672,7 +837,7 @@ export default function Home() {
 
           <p>
             invite you to celebrate<br />
-            the beginning of their forever.
+            the beginning of our happily ever after.
           </p>
         </div>
         <a className="next-cue" href="#story"><span>Begin our story</span><ChevronDown /></a>
@@ -725,12 +890,12 @@ export default function Home() {
               <p>
                 <br />
                 <strong>24 Oct · Engagement</strong><br />
-                7:00 PM – 9:00 PM
+                7:00 PM – 9:00 PM | Saturday
                 <br />
                 <strong>25 Oct · Reception</strong><br />
-                After Muhurtham
+                8.00 AM - 12.00 PM | Sunday
                 <br />
-                Kovilpatti, Thoothukudi
+                Puthugramam, Kovilpatti - 628502
               </p>
 
               <a
@@ -747,7 +912,7 @@ export default function Home() {
               <span>25 · OCT · 2026</span>
               <b>Muhurtham</b>
               <h3>Shenbhagavalli Amman Temple</h3>
-              <p>6:00 AM – 7:00 AM<br />Kovilpatti 628501, Thoothukudi</p>
+              <p>6:00 AM – 7:00 AM | Sunday<br />Kovilpatti 628502</p>
               <a
                 href="https://maps.app.goo.gl/255EAdpTU2puTKdd7"
                 target="_blank"
@@ -763,9 +928,9 @@ export default function Home() {
         <section id="memories" className="page memories section-reveal">
           <div className="memory-bg" />
           <div className="section-heading">
-            <span className="eyebrow">OUR MEMORIES</span>
-            <h2>Moments by the sea</h2>
-            <p>Nine years, countless little stories. Your photographs can live here when they are ready.</p>
+            <span className="eyebrow">THE TWO OF US</span>
+            <h2>Our journey from love to forever</h2>
+            <p>Nine years of writing the story we always dreamed of.</p>
           </div>
           <div className="memory-scroll">
             {["Our first chapter", "Little adventures", "Sunset promises", "Nine years of us", "Forever begins"].map((label, index) => (
