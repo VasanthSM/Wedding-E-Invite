@@ -6,7 +6,6 @@ import {
   ChevronDown,
   Download,
   Heart,
-  ImagePlus,
   MapPin,
   Music2,
   Pause,
@@ -46,75 +45,69 @@ function Cupid({ pose, className = "", alt = "Cupid" }: { pose: CupidPose; class
   );
 }
 
+
 function Music() {
   const [on, setOn] = useState(false);
-  const context = useRef<AudioContext | null>(null);
-  const timer = useRef<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const stop = useCallback(() => {
-    if (timer.current) window.clearInterval(timer.current);
-    timer.current = null;
-    context.current?.close();
-    context.current = null;
-    setOn(false);
+  useEffect(() => {
+    const audio = new Audio("/audio/wedding-melody.mp3");
+    audio.loop = true;
+    audio.volume = 0.5;
+
+    audioRef.current = audio;
+
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+      audioRef.current = null;
+    };
   }, []);
 
-  useEffect(() => stop, [stop]);
+  const toggle = async () => {
+    const audio = audioRef.current;
 
-  function toggle() {
-    if (on) return stop();
+    if (!audio || loading) return;
 
-    const AudioCtx = window.AudioContext;
-    if (!AudioCtx) return;
-    const audio = new AudioCtx();
-    const master = audio.createGain();
-    master.gain.value = 0.055;
-    master.connect(audio.destination);
-    context.current = audio;
+    if (!audio.paused) {
+      audio.pause();
+      setOn(false);
+      return;
+    }
 
-    const progression = [
-      [261.63, 329.63, 392.0, 523.25],
-      [220.0, 329.63, 440.0, 523.25],
-      [196.0, 293.66, 392.0, 493.88],
-      [174.61, 261.63, 349.23, 440.0],
-    ];
-    let bar = 0;
-
-    const playBar = () => {
-      const notes = progression[bar % progression.length];
-      bar += 1;
-      notes.forEach((frequency, index) => {
-        const oscillator = audio.createOscillator();
-        const gain = audio.createGain();
-        const start = audio.currentTime + index * 0.42;
-        oscillator.type = index % 2 ? "sine" : "triangle";
-        oscillator.frequency.setValueAtTime(frequency, start);
-        gain.gain.setValueAtTime(0.0001, start);
-        gain.gain.exponentialRampToValueAtTime(0.14, start + 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.0001, start + 1.25);
-        oscillator.connect(gain).connect(master);
-        oscillator.start(start);
-        oscillator.stop(start + 1.3);
-      });
-    };
-
-    playBar();
-    timer.current = window.setInterval(playBar, 1900);
-    setOn(true);
-  }
+    try {
+      setLoading(true);
+      await audio.play();
+      setOn(true);
+    } catch (error) {
+      console.error("Unable to play wedding music:", error);
+      setOn(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <button className={`music-control ${on ? "is-playing" : ""}`} aria-label={on ? "Pause invitation music" : "Play invitation music"} onClick={toggle}>
+    <button
+      type="button"
+      className={`music-control ${on ? "is-playing" : ""}`}
+      aria-label={on ? "Pause invitation music" : "Play invitation music"}
+      aria-pressed={on}
+      onClick={toggle}
+    >
       <span>{on ? <Pause /> : <Music2 />}</span>
     </button>
   );
 }
 
 function Countdown() {
-  const [left, setLeft] = useState(Math.max(0, WEDDING_TARGET - Date.now()));
+  const [left, setLeft] = useState(0);
 
   useEffect(() => {
-    const id = window.setInterval(() => setLeft(Math.max(0, WEDDING_TARGET - Date.now())), 1000);
+    const update = () => setLeft(Math.max(0, WEDDING_TARGET - Date.now()));
+    update();
+    const id = window.setInterval(update, 1000);
     return () => window.clearInterval(id);
   }, []);
 
@@ -145,7 +138,7 @@ function PremiumScratch({ onComplete }: { onComplete: () => void }) {
   const path = useRef<Array<{ x: number; y: number }>>([]);
   const cells = useRef(new Set<string>());
   const lastPoint = useRef<{ x: number; y: number } | null>(null);
-  const [progress, setProgress] = useState(0);
+  const [, setProgress] = useState(0);
   const [revealed, setRevealed] = useState(false);
 
   const paintCanvas = useCallback(() => {
@@ -929,12 +922,46 @@ export default function Home() {
             <h2>Our journey from love to forever</h2>
             <p>Nine years of writing the story we always dreamed of.</p>
           </div>
+
           <div className="memory-scroll">
-            {["Our first chapter", "Little adventures", "Sunset promises", "Nine years of us", "Forever begins"].map((label, index) => (
-              <article key={label}>
-                <div className="memory-placeholder"><ImagePlus /><span>PHOTO {String(index + 1).padStart(2, "0")}</span></div>
-                <b>{label}</b>
-                <small>{index === 4 ? "25 · 10 · 2026" : "A memory worth keeping"}</small>
+            {[
+              {
+                src: "/images/first-image7.jpg",
+                alt: "Our first chapter — memory 1",
+              },
+              {
+                src: "/images/first-image2.jpg",
+                alt: "Our first chapter — memory 2",
+              },
+              {
+                src: "/images/first-image3.jpg",
+                alt: "Our first chapter — memory 3",
+              },
+              {
+                src: "/images/first-image4.jpg",
+                alt: "Our first chapter — memory 4",
+              },
+              {
+                src: "/images/first-image5.jpg",
+                alt: "Our first chapter — memory 5",
+              },
+              {
+                src: "/images/first-image6.jpg",
+                alt: "Our first chapter — memory 5",
+              },
+              {
+                src: "/images/first-image.jpg",
+                alt: "Our first chapter — memory 5",
+              },
+            ].map((photo) => (
+              <article key={photo.src}>
+                <div className="memory-placeholder memory-photo">
+                  <img
+                    src={photo.src}
+                    alt={photo.alt}
+                    loading="lazy"
+                  />
+                </div>
               </article>
             ))}
           </div>
